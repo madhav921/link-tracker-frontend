@@ -1,22 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Link Tracker — Frontend Dashboard
 
-## Getting Started
+Next.js 15 dashboard for the [link-tracker-backend](https://github.com/madhav921/link-tracker-backend). Create short links and visualise click analytics in real time.
 
-First, run the development server:
+## Pages
+
+| Route | Description |
+|---|---|
+| `/` | Create a new short link |
+| `/dashboard` | All links with total click counts |
+| `/dashboard/:id` | Per-link analytics — time series, countries, devices |
+
+## Stack
+
+- Next.js 15 (App Router, React 18)
+- Tailwind CSS v4
+- Recharts — time series line chart + bar charts
+- SWR — client-side data fetching
+- TypeScript
+
+## Local Development
 
 ```bash
+# 1. Clone
+git clone https://github.com/madhav921/link-tracker-frontend.git
+cd link-tracker-frontend
+
+# 2. Install
+npm install --legacy-peer-deps
+
+# 3. Configure environment
+cp .env.local.example .env.local
+# Edit NEXT_PUBLIC_API_URL to point at your backend
+
+# 4. Run
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
+
+| Variable | Description | Example |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Backend base URL | `https://your-backend.railway.app` |
+
+## Deploy to Vercel
+
+1. Import this repo in [Vercel](https://vercel.com/new)
+2. Set `NEXT_PUBLIC_API_URL` to your Railway backend URL
+3. Deploy — no further config needed
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                 # Create link form
+│   ├── dashboard/
+│   │   ├── page.tsx             # All links table
+│   │   └── [id]/page.tsx        # Per-link analytics
+│   ├── layout.tsx
+│   └── globals.css
+├── components/
+│   └── analytics-charts.tsx     # Recharts line + bar charts
+└── lib/
+    └── api.ts                   # Typed backend API client
+```
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
