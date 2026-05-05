@@ -1,4 +1,18 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+function getApiUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (apiUrl) {
+    return apiUrl;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "http://localhost:3000";
+  }
+
+  throw new Error("NEXT_PUBLIC_API_URL is not configured for production");
+}
+
+const API_URL = getApiUrl();
 
 export type LinkItem = {
   shortId: string;
@@ -22,16 +36,30 @@ export type AnalyticsResponse = {
 };
 
 async function parseResponse<T>(res: Response): Promise<T> {
+  const contentType = res.headers.get("content-type") ?? "";
+
   if (!res.ok) {
     let msg = `Request failed (${res.status})`;
     try {
-      const err = await res.json();
-      if (err?.error) msg = err.error;
+      if (contentType.includes("application/json")) {
+        const err = await res.json();
+        if (err?.error) msg = err.error;
+      } else {
+        const text = await res.text();
+        if (text) {
+          msg = `Expected JSON from API but received ${contentType || "non-JSON response"}`;
+        }
+      }
     } catch {
       // ignore parse errors
     }
     throw new Error(msg);
   }
+
+  if (!contentType.includes("application/json")) {
+    throw new Error(`Expected JSON from API but received ${contentType || "non-JSON response"}`);
+  }
+
   return res.json() as Promise<T>;
 }
 

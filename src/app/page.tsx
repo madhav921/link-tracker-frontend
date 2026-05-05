@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { createLink } from "../lib/api";
 
 type CreatedLink = {
   shortId: string;
@@ -9,8 +10,6 @@ type CreatedLink = {
   originalUrl: string;
   createdAt: string;
 };
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export default function Home() {
   const [originalUrl, setOriginalUrl] = useState("");
@@ -26,17 +25,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/links`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ originalUrl, title: title || undefined }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to create short link");
-      }
-
+      const data = await createLink({ originalUrl, title: title || undefined });
       setCreated(data as CreatedLink);
       setOriginalUrl("");
       setTitle("");
